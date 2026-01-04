@@ -1,0 +1,31 @@
+/* Custom styles for Clinical Trials Search */
+
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+#trials-table td {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#trials-table td:hover {
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.checkbox-group {
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: #fff;
+}
+
+.checkbox-group .form-check {
+    margin-bottom: 0.25rem;
+}

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Results - Clinical Trials{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h4>Search Results</h4>
+        <p class="text-muted mb-0">
+            Showing {{ trials|length }} of {{ "{:,}".format(total_count) }} trials
+            {% if truncated %}
+            <span class="text-warning">(results truncated)</span>
+            {% endif %}
+        </p>
+    </div>
+    <div>
+        <a href="{{ url_for('search.index') }}" class="btn btn-outline-secondary me-2">New Search</a>
+        {% set export_params = [] %}
+        {% if params.compound %}{% set _ = export_params.append('compound=' ~ params.compound|urlencode) %}{% endif %}
+        {% if params.condition %}{% set _ = export_params.append('condition=' ~ params.condition|urlencode) %}{% endif %}
+        {% if params.phases %}{% for p in params.phases %}{% set _ = export_params.append('phases=' ~ p|urlencode) %}{% endfor %}{% endif %}
+        {% if params.statuses %}{% for s in params.statuses %}{% set _ = export_params.append('statuses=' ~ s|urlencode) %}{% endfor %}{% endif %}
+        <a href="{{ url_for('search.export') }}{% if export_params %}?{{ export_params|join('&') }}{% endif %}"
+           class="btn btn-success">Export CSV</a>
+    </div>
+</div>
+
+{% if truncated %}
+<div class="alert alert-warning">
+    Results are limited to 500 trials. Consider adding more specific search criteria to narrow your results.
+</div>
+{% endif %}
+
+{% if trials %}
+<div class="table-responsive">
+    <table id="trials-table" class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>NCT ID</th>
+                <th>Title</th>
+                <th>Phase</th>
+                <th>Status</th>
+                <th>Sponsor</th>
+                <th>Conditions</th>
+                <th>Interventions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for trial in trials %}
+            <tr>
+                <td>
+                    <a href="https://clinicaltrials.gov/study/{{ trial.nct_id }}" target="_blank">
+                        {{ trial.nct_id }}
+                    </a>
+                </td>
+                <td>{{ trial.title }}</td>
+                <td>{{ trial.phase }}</td>
+                <td>{{ trial.status }}</td>
+                <td>{{ trial.sponsor }}</td>
+                <td>{{ trial.conditions | join('; ') }}</td>
+                <td>{{ trial.interventions | join('; ') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info">
+    No trials found matching your search criteria.
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    $('#trials-table').DataTable({
+        paging: true,
+        pageLength: 25,
+        lengthMenu: [10, 25, 50, 100],
+        ordering: true,
+        order: [[0, 'asc']],
+        searching: true
+    });
+});
+</script>
+{% endblock %}
